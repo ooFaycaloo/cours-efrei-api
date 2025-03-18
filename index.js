@@ -76,7 +76,7 @@ app.put("/users/:id", (req, res) => {
 
 // Delete a user 
 app.delete("/users/:id", (req,res) => {
-  users = users.filter(user => user.id === parseInt(req.params.id))
+  users = users.filter(user => user.id !== parseInt(req.params.id))
   res.json({ message: "Utilisateur supprimé" });
 })
 
