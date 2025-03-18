@@ -3,7 +3,7 @@ const app = express();
 app.use(express.json());
 const port = 3000;
 
-const users = [
+let users = [
   {
     id: 0,
     name: "Alex",
@@ -25,7 +25,7 @@ app.get("/", (req, res) => {
 })
 
 // Get all users
-app.get("/users", (req, res) => {
+app.get("/users/", (req, res) => {
   res.json(users);
   console.log('user requested all users');
 });
@@ -41,6 +41,14 @@ app.get("/users/:id", (req, res) => {
   
   res.json(user);
 })
+
+// Create a new user
+app.post("/users/", (req, res) => {
+  const newUser = req.body;
+  users.push(newUser);
+  res.status(201).json(newUser);
+})
+
 
 // Update a single user
 app.put("/users/:id", (req, res) => {
@@ -58,6 +66,7 @@ app.put("/users/:id", (req, res) => {
   res.json(user);
 });
 
+// Delete a user 
 app.delete("/users/:id", (req,res) => {
   users = users.filter(user => user.id === parseInt(req.params.id))
   res.json({ message: "Utilisateur supprimé" });
