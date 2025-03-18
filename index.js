@@ -5,11 +5,11 @@ const port = 3000;
 
 let users = [
   {
-    id: 0,
+    id: crypto.randomUUID(),
     name: "Alex",
   },
   {
-    id: 1,
+    id: crypto.randomUUID(),
     name: "Emma",
   },
 ];
@@ -44,9 +44,17 @@ app.get("/users/:id", (req, res) => {
 
 // Create a new user
 app.post("/users/", (req, res) => {
-  const newUser = req.body;
-  users.push(newUser);
-  res.status(201).json(newUser);
+  const newUser = {};
+  newUser.id = crypto.randomUUID();
+  if(typeof(req.body.name) === "string"){
+    newUser.name = req.body.name;
+    users.push(newUser);
+    res.status(201).json(newUser);
+  } else {
+    res.status(400).json("incorrect body parameters");
+  }
+  
+  
 })
 
 
