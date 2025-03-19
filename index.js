@@ -19,6 +19,20 @@ mongoose.connect(mongoURL, )
     console.log('failed connection ❌', err);
   })
 
+const userSchema = new mongoose.Schema({
+  name:{
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  }
+})
+
+const User = mongoose.model('User', userSchema);
+
 let users = [
   {
     id: crypto.randomUUID(),
@@ -31,6 +45,8 @@ let users = [
     password: bcrypt.hashSync("password456", 10)
   },
 ];
+
+
 
 
 // default route
@@ -58,26 +74,23 @@ app.get("/users/:id", (req, res) => {
 
 // Create a new user
 app.post("/users/", async (req, res) => {
-  const { name, password } = req.body;
+  try {
+    const { name, password } = req.body;
   
-  if(!name || !password){
-    return sendError(res, "Name and password are required");
+    if (!name || !password) {
+      return sendError(res, "Name and password are required");
+    }
+  
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    const newUser = new User({name, password: hashedPassword });
+    
+    newUser.save();
+    
+    res.status(201).json({ message: "user created successfully", newUser: newUser });
+  } catch (err){
+    sendError(res, err);
   }
-  
-  if(findUser(users, name)){
-    return sendError(res, "User already exists");
-  }
-  
-  const hashedPassword = await bcrypt.hash(password, 10);
-  
-  const newUser = {
-    id: crypto.randomUUID(),
-    name: name,
-    password: hashedPassword
-  };
-  
-  users.push(newUser);
-  res.status(201).json({ message: "user created successfully", newUser: newUser });
 })
 
 app.post("/login", (req, res) => {
