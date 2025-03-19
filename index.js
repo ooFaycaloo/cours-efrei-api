@@ -55,21 +55,25 @@ app.get("/", (req, res) => {
 })
 
 // Get all users
-app.get("/users/", (req, res) => {
-  res.json(users);
-  console.log('user requested all users');
+app.get("/users/", async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(200).json(users);
+  } catch(err){
+    sendError(res, err)
+  }
 });
 
 // Get a single user
-app.get("/users/:id", (req, res) => {
-  const user = users.find(user => user.id === parseInt(req.params.id));
+app.get("/users/:id", async (req, res) => {
+  const id = req.params.id
   
-  if(!user){
-    res.status(404);
-    sendError(res, "User not found");
+  try {
+    const user = await User.findOne({ _id : id});
+    res.status(200).json(user);
+  } catch (err){
+    sendError(res, err)
   }
-  
-  res.json(user);
 })
 
 // Create a new user
@@ -93,64 +97,47 @@ app.post("/users/", async (req, res) => {
   }
 })
 
-app.post("/login", (req, res) => {
-  const { name, password } = req.body;
-  
-  if(!name || !password){
-    return sendError(res, "Name and password are required");
-  }
-  
-  const user = findUser(users, name)
-  
-  if(!user){
-    return sendError(res, "User doesn't exist");
-  }
-  
-  const isMatch = bcrypt.compareSync(password, user.password);
-
-  
-  if(!isMatch){
-    sendError(res, "Name or Password doesn't match");
-  } else {
-    res.status(200).send("user logged in successfully");
-  }
-})
-
 // Update a single user
-app.put("/users/:id", (req, res) => {
-  const { name, oldPassword, newPassword } = req.body;
+app.put("/users/:id", async(req, res) => {
+  try{
+    const id = req.params.id
+    const { name, newPassword, oldPassword } = req.body;
   
-  if(!name || !newPassword){
-    return sendError(res, "Name and password are required");
-  }
-  
-  const user = findUser(users, name)
-  
-  if(!user){
-    return sendError(res, "User doesn't exist");
-  }
-  
-  const isMatch = bcrypt.compareSync(oldPassword, user.password);
-  
-
-
-  if(isMatch){
-    user.name = name;
-    if(newPassword){
-      user.password = bcrypt.hashSync(newPassword, 10);
+    const user = await User.findOne({_id: id});
+    
+    if(!user){
+      return sendError(res, "User doesn't exist");
     }
     
-    res.status(200).json(user)
-  } else {
-    sendError(res, "Old password doesn't match");
+    const isMatch = bcrypt.compareSync(oldPassword, user.password);
+  
+    if(isMatch){
+      
+      await User.findOneAndUpdate({_id: id}, {
+        name : name,
+        password: bcrypt.hashSync(newPassword || oldPassword, 10)
+      })
+      
+      res.status(200).json(user)
+    } else {
+      sendError(res, "Old password doesn't match");
+    }
+  } catch(err){
+    sendError(res, err)
   }
   
 });
 
 // Delete a user 
-app.delete("/users/:id", (req,res) => {
-  users = users.filter(user => user.id !== parseInt(req.params.id))
-  res.json({ message: "Utilisateur supprimé" });
+app.delete("/users/:id", async (req,res) => {
+  const id = req.params.id;
+
+  try {
+    await User.findOneAndDelete({ _id: id });
+    res.status(204).send("User deleted succesfully");
+  } catch(err){
+    sendError(res, err);
+  }
 })
 
 // Launch the server, start listening to events
