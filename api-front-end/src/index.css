@@ -1,0 +1,96 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    transition: all 0.2s ease 0s;
+}
+
+body {
+    font-family: "Hanken Grotesk", sans-serif;
+    background: #1e1e1e;
+    color: white;
+}
+
+.login {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .login-container {
+        width: 450px;
+        height: 350px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    h1 {
+        margin-bottom: 250px;
+    }
+    form {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        gap: 40px;
+
+
+        .input {
+            position: relative;
+            border-bottom: 1px solid #c1c1c190;
+            height: 35px;
+            label {
+                position: absolute;
+                opacity: 0.4;
+            }
+            &:has(input:not(:placeholder-shown)) {
+                label {
+                    margin-top: -25px;
+                    color: aquamarine;
+                    opacity: 1;
+                }
+                border-bottom: 1px solid aquamarine;
+            }
+            
+            &:has(input:focus){
+                label {
+                    margin-top: -25px;
+                    color: aquamarine;
+                    opacity: 1;
+                }
+            }
+            &:hover {
+                label {
+                    color: aquamarine;
+                }
+            }
+        }
+        input {
+            all: unset;
+            position: relative;
+            width: 100%;
+        }
+
+        button {
+            all: unset;
+            margin-top: 55px;
+
+            border: none;
+            color: black;
+            background: white;
+            width: 100%;
+            border-radius: 100px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            &:hover {
+                background: aquamarine;
+                color: white;
+                cursor: pointer;
+            }
+        }
+    }
+}
